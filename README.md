@@ -1,81 +1,70 @@
-# Dungeons & Dragons Encounter Builder
+# Getting Started with Create React App
 
-This project is a Dungeons & Dragons encounter builder that utilizes the Open5e API (https://open5e.com/) to create and manage encounters. Users can select monsters, build encounters, and retrieve relevant data to enhance their gaming experience.
+This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
-## Project Structure
+## Available Scripts
 
-- **src/**: Contains the source code for the application.
-  - **api/**: Functions to interact with the Open5e API.
-    - `open5e.ts`: Contains `fetchMonsters` function.
-  - **components/**: React components for the application.
-    - `EncounterBuilder.tsx`: The main component for building encounters.
-    - `MonsterSection.tsx`: Component for loading and displaying monsters by Challenge Rating (CR).
-    - `PartyMember.tsx`: Component for managing party members.
-  - **services/**: Services related to encounter management.
-    - `encounterService.ts`: Functions like `createEncounter` and `getEncounterDetails`.
-  - **utils/**: Utility functions for various tasks.
-    - `helpers.ts`: Functions like `calculateChallengeRating` and `formatMonsterData`.
-  - `App.tsx`: The main application component.
-  - `index.tsx`: The entry point of the application.
-  - `App.css`: CSS file for styling the application.
-  - `index.css`: CSS file for global styles.
-  - `App.test.tsx`: Test file for the main application component.
-  - `setupTests.tsx`: Setup file for testing.
-  - `reportWebVitals.tsx`: File for reporting web vitals.
+In the project directory, you can run:
 
-- **public/**: Contains public assets.
-  - `index.html`: The main HTML file for the application.
-  - `manifest.json`: Web app manifest file.
-  - `robots.txt`: Robots exclusion file.
+### `npm start`
 
-- **tsconfig.json**: TypeScript configuration file.
+Runs the app in the development mode.\
+Open [http://localhost:3000](http://localhost:3000) to view it in your browser.
 
-- **package.json**: npm configuration file.
+The page will reload when you make changes.\
+You may also see any lint errors in the console.
 
-- **.gitignore**: Git ignore file.
+### `npm test`
 
-## Setup Instructions
+Launches the test runner in the interactive watch mode.\
+See the section about [running tests](https://facebook.github.io/create-react-app/docs/running-tests) for more information.
 
-1. Clone the repository:
-   ```sh
-   git clone <repository-url>
-   ```
+### `npm run build`
 
-2. Navigate to the project directory:
-   ```sh
-   cd dnd-encounter-builder
-   ```
+Builds the app for production to the `build` folder.\
+It correctly bundles React in production mode and optimizes the build for the best performance.
 
-3. Install the dependencies:
-   ```sh
-   npm install
-   ```
+The build is minified and the filenames include the hashes.\
+Your app is ready to be deployed!
 
-4. Start the development server:
-   ```sh
-   npm start
-   ```
+See the section about [deployment](https://facebook.github.io/create-react-app/docs/deployment) for more information.
 
-## Usage
+### `npm run eject`
 
-Once the application is running, you can use the Encounter Builder to select monsters and create encounters. The application will fetch data from the Open5e API to provide you with the necessary information.
+**Note: this is a one-way operation. Once you `eject`, you can't go back!**
 
-### Selecting Monsters
+If you aren't satisfied with the build tool and configuration choices, you can `eject` at any time. This command will remove the single build dependency from your project.
 
-- The application displays sections for different Challenge Ratings (CR).
-- Click on a section to load and display monsters with the selected CR.
-- Click on a monster to add it to the encounter.
+Instead, it will copy all the configuration files and the transitive dependencies (webpack, Babel, ESLint, etc) right into your project so you have full control over them. All of the commands except `eject` will still work, but they will point to the copied scripts so you can tweak them. At this point you're on your own.
 
-### Managing Party Members
+You don't have to ever use `eject`. The curated feature set is suitable for small and middle deployments, and you shouldn't feel obligated to use this feature. However we understand that this tool wouldn't be useful if you couldn't customize it when you are ready for it.
 
-- Add party members and set their levels.
-- The application calculates the experience budget based on the party members' levels.
+## Learn More
 
-### Creating Encounters
+You can learn more in the [Create React App documentation](https://facebook.github.io/create-react-app/docs/getting-started).
 
-- The application calculates the total experience of the selected monsters.
-- The encounter difficulty is determined based on the experience budget and the total monster experience.
+To learn React, check out the [React documentation](https://reactjs.org/).
 
-## Contributing
+### Code Splitting
 
-Contributions are welcome! Please open an issue or submit a pull request for any enhancements or bug fixes.
+This section has moved here: [https://facebook.github.io/create-react-app/docs/code-splitting](https://facebook.github.io/create-react-app/docs/code-splitting)
+
+### Analyzing the Bundle Size
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size](https://facebook.github.io/create-react-app/docs/analyzing-the-bundle-size)
+
+### Making a Progressive Web App
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app](https://facebook.github.io/create-react-app/docs/making-a-progressive-web-app)
+
+### Advanced Configuration
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/advanced-configuration](https://facebook.github.io/create-react-app/docs/advanced-configuration)
+
+### Deployment
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/deployment](https://facebook.github.io/create-react-app/docs/deployment)
+
+### `npm run build` fails to minify
+
+This section has moved here: [https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify](https://facebook.github.io/create-react-app/docs/troubleshooting#npm-run-build-fails-to-minify)
