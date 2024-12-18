@@ -1,6 +1,7 @@
 # Dungeons & Dragons Encounter Builder
 
 This project is a Dungeons & Dragons encounter builder that utilizes the Open5e API (https://open5e.com/) to create and manage encounters. Users can select monsters, build encounters, and retrieve relevant data to enhance their gaming experience.
+Used wtih WOTC SRD
 
 ## Project Structure
 
