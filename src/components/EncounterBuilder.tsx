@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Monster } from '../services/encounterService';
 import MonsterSection from './MonsterSection';
 import PartyMember from './PartyMember';
+import './EncounterBuilder.css';
 
 const experienceBudget = [
     [50, 75, 100], [100, 150, 200], [150, 225, 400], [250, 375, 500], [500, 750, 1100],
@@ -106,68 +107,68 @@ const EncounterBuilder = () => {
     ];
 
     return (
-        <div>
+        <div className="encounter-builder">
             <h1>Encounter Builder</h1>
-            <div>
-                <h2>Select Environment</h2>
-                <select value={selectedEnvironment} onChange={handleEnvironmentChange}>
-                    <option value="">All</option>
-                    {environments.map(env => (
-                        <option key={env} value={env}>{env}</option>
+            <div className="top-section">
+                <div className="party-members-section">
+                    <h2>Party Members</h2>
+                    <button onClick={handleAddPartyMember}>Add Party Member</button>
+                    {partyMembers.map(member => (
+                        <PartyMember
+                            key={member.id}
+                            id={member.id}
+                            level={member.level}
+                            onLevelChange={handlePartyMemberLevelChange}
+                            onRemove={handlePartyMemberRemove}
+                        />
                     ))}
-                </select>
-            </div>
-            <div>
-                <h2>Select Monsters</h2>
-                {crValues.map(cr => (
-                    <MonsterSection key={cr.value} cr={cr.value.toString()} label={cr.label} environments={[selectedEnvironment]} onSelectMonster={handleMonsterSelect} />
-                ))}
-            </div>
-            <div>
-                <h2>Selected Monsters</h2>
-                {selectedMonsters.length > 0 ? (
-                    <ul>
-                       {selectedMonsters.map((monster) => (
-                            <li key={monster.name}>
-                                <span>{monster.name}</span>
-                                <button onClick={() => handleMonsterRemove(monster.name)}>Remove</button>
-                                <button onClick={() => toggleMonsterCollapse(monster.name)}>
-                                    {collapsedMonsters[monster.name] ? 'Show Info' : 'Hide Info'}
-                                </button>
-                                {!collapsedMonsters[monster.name] && (
-                                    <pre>{JSON.stringify(monster, null, 2)}</pre>
-                                )}
-                            </li>
+                    <div className="experience-section">
+                        <h2>Experience Budget</h2>
+                        <div className="experience-budget">
+                            <p className="experience-budget-low">Low: {experienceBudgetTotal.low}</p>
+                            <p className="experience-budget-moderate">Moderate: {experienceBudgetTotal.moderate}</p>
+                            <p className="experience-budget-high">High: {experienceBudgetTotal.high}</p>
+                        </div>
+                        <h2>Total Monster Experience</h2>
+                        <p>{totalMonsterExperience}</p>
+                        <h2>Encounter Difficulty</h2>
+                        <p>{difficulty}</p>
+                    </div>
+                </div>
+                <div className="selected-monsters-section">
+                    <h2>Selected Monsters</h2>
+                    {selectedMonsters.length > 0 ? (
+                        <ul className="monster-list">
+                            {selectedMonsters.map((monster) => (
+                                <li key={monster.name} className="monster-item">
+                                    <span className="monster-name">{monster.name}</span>
+                                    <button onClick={() => handleMonsterRemove(monster.name)}>Remove</button>
+                                    <button onClick={() => toggleMonsterCollapse(monster.name)}>
+                                        {collapsedMonsters[monster.name] ? 'Show Info' : 'Hide Info'}
+                                    </button>
+                                    {!collapsedMonsters[monster.name] && (
+                                        <pre className="monster-json">{JSON.stringify(monster, null, 2)}</pre>
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No monsters selected</p>
+                    )}
+                </div>
+                <div className="environment-section">
+                    <h2>Select Environment</h2>
+                    <select value={selectedEnvironment} onChange={handleEnvironmentChange}>
+                        <option value="">All</option>
+                        {environments.map(env => (
+                            <option key={env} value={env}>{env}</option>
                         ))}
-                    </ul>
-                ) : (
-                    <p>No monsters selected</p>
-                )}
-            </div>
-            <div>
-                <h2>Party Members</h2>
-                <button onClick={handleAddPartyMember}>Add Party Member</button>
-                {partyMembers.map(member => (
-                    <PartyMember
-                        key={member.id}
-                        id={member.id}
-                        level={member.level}
-                        onLevelChange={handlePartyMemberLevelChange}
-                        onRemove={handlePartyMemberRemove}
-                    />
-                ))}
-            </div>
-            <div>
-                <h2>Experience Budget</h2>
-                <p>Low: {experienceBudgetTotal.low}</p>
-                <p>Moderate: {experienceBudgetTotal.moderate}</p>
-                <p>High: {experienceBudgetTotal.high}</p>
-            </div>
-            <div>
-                <h2>Total Monster Experience</h2>
-                <p>{totalMonsterExperience}</p>
-                <h2>Encounter Difficulty</h2>
-                <p>{difficulty}</p>
+                    </select>
+                    <h2>Select Monsters</h2>
+                    {crValues.map(cr => (
+                        <MonsterSection key={cr.value} cr={cr.value.toString()} label={cr.label} environments={[selectedEnvironment]} onSelectMonster={handleMonsterSelect} />
+                    ))}
+                </div>
             </div>
         </div>
     );

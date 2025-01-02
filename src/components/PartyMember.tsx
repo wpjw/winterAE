@@ -13,16 +13,16 @@ const PartyMember: React.FC<PartyMemberProps> = ({ id, level, onLevelChange, onR
     };
 
     return (
-        <div>
-            <label>
+        <div className="party-member">
+            <label className="party-member-label">
                 Level:
-                <select value={level} onChange={handleLevelChange}>
+                <select value={level} onChange={handleLevelChange} className="party-member-select">
                     {Array.from({ length: 20 }, (_, i) => i + 1).map(level => (
                         <option key={level} value={level}>{level}</option>
                     ))}
                 </select>
             </label>
-            <button onClick={() => onRemove(id)}>Remove</button>
+            <button onClick={() => onRemove(id)} className="party-member-button">Remove</button>
         </div>
     );
 };

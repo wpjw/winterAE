@@ -1,5 +1,6 @@
 import React, { useState, useEffect, useCallback } from 'react';
 import { fetchMonsters } from '../api/open5e';
+import './MonsterSection.css';
 
 interface Monster {
     id: string;
@@ -24,7 +25,7 @@ const MonsterSection: React.FC<MonsterSectionProps> = ({ cr, label, environments
     const [isCollapsed, setIsCollapsed] = useState(true);
 
     const loadMonsters = useCallback(async () => {
-        const monsterData = await fetchMonsters(cr, environments);
+        const monsterData = await fetchMonsters(cr, );
         const filteredMonsters = environments.includes('')
             ? monsterData.results
             : monsterData.results.filter((monster: Monster) =>
@@ -48,15 +49,15 @@ const MonsterSection: React.FC<MonsterSectionProps> = ({ cr, label, environments
     };
 
     return (
-        <div>
-            <button onClick={handleButtonClick} style={{ background: 'none', border: 'none', padding: 0, font: 'inherit', cursor: 'pointer', textDecoration: 'underline' }}>
+        <div className="monster-section">
+            <button onClick={handleButtonClick} className="monster-section-button">
                 Monsters with CR {label}
             </button>
             {!isCollapsed && (
-                <ul>
+                <ul className="monster-list">
                     {monsters.map((monster) => (
-                        <li key={monster.id}>
-                            <button onClick={() => onSelectMonster(monster)}>
+                        <li key={monster.id} className="monster-item">
+                            <button onClick={() => onSelectMonster(monster)} className="monster-select-button">
                                 {monster.name}
                             </button>
                         </li>
