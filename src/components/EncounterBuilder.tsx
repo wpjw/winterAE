@@ -17,7 +17,7 @@ const crExperiencePoints: { [key: number]: number } = {
 };
 
 const environments = [
-    "Underdark", "Sewer", "Caverns", "Plane Of Water", "Water"
+    "Arctic", "Coastal", "Desert", "Forest", "Grassland", "Hill", "Mountain", "Swamp", "Underdark", "Underwater", "Urban"
 ];
 
 const EncounterBuilder = () => {
@@ -25,13 +25,26 @@ const EncounterBuilder = () => {
     const [partyMembers, setPartyMembers] = useState<{ id: number, level: number }[]>([]);
     const [nextPartyMemberId, setNextPartyMemberId] = useState(1);
     const [selectedEnvironment, setSelectedEnvironment] = useState<string>('');
+    const [collapsedMonsters, setCollapsedMonsters] = useState<{ [key: string]: boolean }>({});
 
     const handleMonsterSelect = (monster: Monster) => {
         setSelectedMonsters((prev) => [...prev, monster]);
     };
 
-    const handleMonsterRemove = (monsterId: string) => {
-        setSelectedMonsters((prev) => prev.filter(monster => monster.id !== monsterId));
+    const handleMonsterRemove = (name: string) => {
+        setSelectedMonsters((prev) => prev.filter(monster => monster.name !== name));
+        setCollapsedMonsters((prev) => {
+            const newCollapsed = { ...prev };
+            delete newCollapsed[name];
+            return newCollapsed;
+        });
+    };
+
+    const toggleMonsterCollapse = (name: string) => {
+        setCollapsedMonsters((prev) => ({
+            ...prev,
+            [name]: !prev[name]
+        }));
     };
 
     const handleAddPartyMember = () => {
@@ -114,10 +127,16 @@ const EncounterBuilder = () => {
                 <h2>Selected Monsters</h2>
                 {selectedMonsters.length > 0 ? (
                     <ul>
-                        {selectedMonsters.map((monster) => (
-                            <li key={monster.id}>
-                                <button onClick={() => handleMonsterRemove(monster.id)}>Remove</button>
-                                <pre>{JSON.stringify(monster, null, 2)}</pre>
+                       {selectedMonsters.map((monster) => (
+                            <li key={monster.name}>
+                                <span>{monster.name}</span>
+                                <button onClick={() => handleMonsterRemove(monster.name)}>Remove</button>
+                                <button onClick={() => toggleMonsterCollapse(monster.name)}>
+                                    {collapsedMonsters[monster.name] ? 'Show Info' : 'Hide Info'}
+                                </button>
+                                {!collapsedMonsters[monster.name] && (
+                                    <pre>{JSON.stringify(monster, null, 2)}</pre>
+                                )}
                             </li>
                         ))}
                     </ul>

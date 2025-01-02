@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useState, useEffect, useCallback } from 'react';
 import { fetchMonsters } from '../api/open5e';
 
 interface Monster {
@@ -21,21 +21,38 @@ interface MonsterSectionProps {
 const MonsterSection: React.FC<MonsterSectionProps> = ({ cr, label, environments, onSelectMonster }) => {
     const [monsters, setMonsters] = useState<Monster[]>([]);
     const [isLoaded, setIsLoaded] = useState(false);
+    const [isCollapsed, setIsCollapsed] = useState(true);
 
-    const loadMonsters = async () => {
-        if (!isLoaded) {
-            const monsterData = await fetchMonsters(cr, environments);
-            setMonsters(monsterData.results);
-            setIsLoaded(true);
+    const loadMonsters = useCallback(async () => {
+        const monsterData = await fetchMonsters(cr, environments);
+        const filteredMonsters = environments.includes('')
+            ? monsterData.results
+            : monsterData.results.filter((monster: Monster) =>
+                environments.some(env => monster.environments.includes(env))
+            );
+        setMonsters(filteredMonsters);
+        setIsLoaded(true);
+    }, [cr, environments]);
+
+    useEffect(() => {
+        if (isLoaded) {
+            loadMonsters();
         }
+    }, [environments, isLoaded, loadMonsters]);
+
+    const handleButtonClick = () => {
+        if (!isLoaded) {
+            loadMonsters();
+        }
+        setIsCollapsed(!isCollapsed);
     };
 
     return (
         <div>
-            <button onClick={loadMonsters} style={{ background: 'none', border: 'none', padding: 0, font: 'inherit', cursor: 'pointer', textDecoration: 'underline' }}>
+            <button onClick={handleButtonClick} style={{ background: 'none', border: 'none', padding: 0, font: 'inherit', cursor: 'pointer', textDecoration: 'underline' }}>
                 Monsters with CR {label}
             </button>
-            {isLoaded && (
+            {!isCollapsed && (
                 <ul>
                     {monsters.map((monster) => (
                         <li key={monster.id}>
