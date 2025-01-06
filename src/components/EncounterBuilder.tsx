@@ -2,6 +2,7 @@ import React, { useState } from 'react';
 import { Monster } from '../services/encounterService';
 import MonsterSection from './MonsterSection';
 import PartyMember from './PartyMember';
+import MonsterDetails from './MonsterDetails';
 import './EncounterBuilder.css';
 
 const experienceBudget = [
@@ -147,7 +148,7 @@ const EncounterBuilder = () => {
                                         {collapsedMonsters[monster.name] ? 'Show Info' : 'Hide Info'}
                                     </button>
                                     {!collapsedMonsters[monster.name] && (
-                                        <pre className="monster-json">{JSON.stringify(monster, null, 2)}</pre>
+                                        <MonsterDetails monster={monster} />
                                     )}
                                 </li>
                             ))}
