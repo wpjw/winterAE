@@ -1,0 +1,31 @@
+export interface Monster {
+  id: string;
+  name: string;
+  challenge_rating: string;
+  hit_points: number;
+  type: string;
+  armor_class: number;
+  environments: string[];
+  desc: string;
+  size: string;
+  alignment: string;
+  speed: { walk: number; fly?: number; swim?: number };
+  strength: number;
+  dexterity: number;
+  constitution: number;
+  intelligence: number;
+  wisdom: number;
+  charisma: number;
+  damage_vulnerabilities: string;
+  damage_resistances: string;
+  damage_immunities: string;
+  condition_immunities: string;
+  senses: string;
+  languages: string;
+  actions?: { name: string; desc: string }[];
+  special_abilities?: { name: string; desc: string }[];
+  legendary_desc?: string;
+  legendary_actions?: { name: string; desc: string }[];
+  reactions?: { name: string; desc: string }[];
+  bonus_actions?: { name: string; desc: string }[];
+}
