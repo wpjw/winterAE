@@ -9,6 +9,7 @@ import MonsterDetails from "./MonsterDetails";
 import "./EncounterBuilder.css";
 import { Monster } from "../types/monsters";
 
+// List of possible environments
 const environments = [
   "Arctic",
   "Coastal",
@@ -24,12 +25,17 @@ const environments = [
 ];
 
 const EncounterBuilder = () => {
+  // State to store selected monsters
   const [selectedMonsters, setSelectedMonsters] = useState<Monster[]>([]);
+  // State to store party members
   const [partyMembers, setPartyMembers] = useState<
     { id: number; level: number }[]
   >([]);
+  // State to track the next party member ID
   const [nextPartyMemberId, setNextPartyMemberId] = useState(1);
+  // State to store the selected environment
   const [selectedEnvironment, setSelectedEnvironment] = useState<string>("");
+  // State to track collapsed monsters
   const [collapsedMonsters, setCollapsedMonsters] = useState<{
     [key: number]: boolean;
   }>({});
@@ -88,11 +94,13 @@ const EncounterBuilder = () => {
       [idx]: !prev[idx],
     }));
   };
-
+  // Calculate the total experience budget for the party
   const experienceBudgetTotal = calculateExperienceBudget(partyMembers);
+  // Calculate the total experience of the selected monsters
   const totalMonsterExperience =
     calculateTotalMonsterExperience(selectedMonsters);
 
+  // Determine the difficulty of the encounter
   const determineDifficulty = () => {
     if (totalMonsterExperience < experienceBudgetTotal.moderate) {
       return "Low";
@@ -102,6 +110,7 @@ const EncounterBuilder = () => {
       return "High";
     }
   };
+  // Get the CSS class for the difficulty
   const getDifficultyClass = (difficulty: string) => {
     switch (difficulty) {
       case "Low":
@@ -117,6 +126,7 @@ const EncounterBuilder = () => {
 
   const difficulty = determineDifficulty();
 
+  // List of challenge rating values
   const crValues = [
     { value: 0, label: "0" },
     { value: 0.125, label: "1/8" },

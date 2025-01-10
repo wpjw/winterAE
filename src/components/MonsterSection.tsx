@@ -2,6 +2,7 @@ import React, { useState, useCallback } from "react";
 import { fetchMonsters } from "../api/open5e";
 import "./MonsterSection.css";
 
+// Define the Monster interface to type the monster objects
 interface Monster {
   id: string;
   name: string;
@@ -30,11 +31,12 @@ interface Monster {
   condition_immunities: string;
 }
 
+// Define the props for the MonsterSection component
 interface MonsterSectionProps {
-  cr: string;
-  label: string;
-  environments: string[];
-  onSelectMonster: (monster: Monster) => void;
+  cr: string; // Challenge rating filter
+  label: string; // Label for the section
+  environments: string[]; // Environments filter
+  onSelectMonster: (monster: Monster) => void; // Callback when a monster is selected
 }
 
 const MonsterSection: React.FC<MonsterSectionProps> = ({
@@ -43,16 +45,22 @@ const MonsterSection: React.FC<MonsterSectionProps> = ({
   environments,
   onSelectMonster,
 }) => {
+  // State to store the list of monsters
   const [monsters, setMonsters] = useState<Monster[]>([]);
+  // State to track if the data is loaded
   const [isLoaded, setIsLoaded] = useState(false);
+  // State to track if the section is collapsed
   const [isCollapsed, setIsCollapsed] = useState(true);
+  // State to track if the data is loading
   const [isLoading, setIsLoading] = useState(false);
+  // Filter monsters based on the environments prop
   const filteredMonsters = environments.includes("")
     ? monsters
     : monsters.filter((monster: Monster) =>
         environments.some((env) => monster.environments.includes(env))
       );
 
+  // Function to fetch monsters from the API
   const loadMonsters = useCallback(async () => {
     setIsLoading(true);
     const monsterData = await fetchMonsters(cr);
@@ -62,6 +70,7 @@ const MonsterSection: React.FC<MonsterSectionProps> = ({
     setIsLoading(false);
   }, [cr]);
 
+  // Function to handle the collapse toggle
   const handleButtonClick = () => {
     if (!isLoaded) {
       loadMonsters();

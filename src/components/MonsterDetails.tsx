@@ -3,7 +3,7 @@ import { Monster } from "../types/monsters";
 export interface MonsterDetailsProps {
   monster: Monster;
 }
-
+// MonsterDetails component conditionally renders the various properties based on if they're empty/null or not
 const MonsterDetails: React.FC<MonsterDetailsProps> = ({ monster }) => {
   return (
     <div className="monster-details">

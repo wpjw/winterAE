@@ -1,18 +1,21 @@
 import React from "react";
 
+// Define the props for the PartyMember component
 interface PartyMemberProps {
-  id: number;
-  level: number;
-  onLevelChange: (id: number, level: number) => void;
-  onRemove: (id: number) => void;
+  id: number; // Unique identifier for the party member
+  level: number; // Level of the party member
+  onLevelChange: (id: number, level: number) => void; // Callback when the level changes
+  onRemove: (id: number) => void; // Callback when the party member is removed
 }
 
+// PartyMember component
 const PartyMember: React.FC<PartyMemberProps> = ({
   id,
   level,
   onLevelChange,
   onRemove,
 }) => {
+  // Handle the change in level
   const handleLevelChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
     onLevelChange(id, parseInt(event.target.value, 10));
   };
