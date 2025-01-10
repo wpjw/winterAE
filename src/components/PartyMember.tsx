@@ -15,8 +15,7 @@ const PartyMember: React.FC<PartyMemberProps> = ({ id, level, onLevelChange, onR
     return (
         <div className="party-member">
             <label className="party-member-label">
-                Level:
-                <select value={level} onChange={handleLevelChange} className="party-member-select">
+                Level: <select value={level} onChange={handleLevelChange} className="party-member-select">
                     {Array.from({ length: 20 }, (_, i) => i + 1).map(level => (
                         <option key={level} value={level}>{level}</option>
                     ))}

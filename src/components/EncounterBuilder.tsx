@@ -24,36 +24,24 @@ const environments = [
 
 const EncounterBuilder = () => {
     const [selectedMonsters, setSelectedMonsters] = useState<Monster[]>([]);
-    const [partyMembers, setPartyMembers] = useState<{ id: number, level: number }[]>([]);
-    const [nextPartyMemberId, setNextPartyMemberId] = useState(1);
-    const [selectedEnvironment, setSelectedEnvironment] = useState<string>('');
-    const [collapsedMonsters, setCollapsedMonsters] = useState<{ [key: string]: boolean }>({});
 
     const handleMonsterSelect = (monster: Monster) => {
         setSelectedMonsters((prev) => [...prev, monster]);
     };
-
-    const handleMonsterRemove = (name: string) => {
-        setSelectedMonsters((prev) => prev.filter(monster => monster.name !== name));
-        setCollapsedMonsters((prev) => {
-            const newCollapsed = { ...prev };
-            delete newCollapsed[name];
-            return newCollapsed;
-        });
+    const handleMonsterRemove = (idx: number) => {
+        setSelectedMonsters((prev) => prev.filter((_, index) => index !== idx));
     };
-
-    const toggleMonsterCollapse = (name: string) => {
-        setCollapsedMonsters((prev) => ({
-            ...prev,
-            [name]: !prev[name]
-        }));
+    const handleRemoveAllMonsters = () => {
+        setSelectedMonsters([]);
     };
-
+   
+    const [partyMembers, setPartyMembers] = useState<{ id: number, level: number }[]>([]);
     const handleAddPartyMember = () => {
         setPartyMembers((prev) => [...prev, { id: nextPartyMemberId, level: 1 }]);
         setNextPartyMemberId((prev) => prev + 1);
     };
 
+    const [nextPartyMemberId, setNextPartyMemberId] = useState(1);
     const handlePartyMemberLevelChange = (id: number, level: number) => {
         setPartyMembers((prev) => prev.map(member => member.id === id ? { ...member, level } : member));
     };
@@ -61,9 +49,18 @@ const EncounterBuilder = () => {
     const handlePartyMemberRemove = (id: number) => {
         setPartyMembers((prev) => prev.filter(member => member.id !== id));
     };
+    const [selectedEnvironment, setSelectedEnvironment] = useState<string>('');
 
     const handleEnvironmentChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedEnvironment(event.target.value);
+    };
+    const [collapsedMonsters, setCollapsedMonsters] = useState<{ [key: string]: boolean }>({});
+
+    const toggleMonsterCollapse = (name: string) => {
+        setCollapsedMonsters((prev) => ({
+            ...prev,
+            [name]: !prev[name]
+        }));
     };
 
     const calculateExperienceBudget = () => {
@@ -88,15 +85,14 @@ const EncounterBuilder = () => {
     const totalMonsterExperience = calculateTotalMonsterExperience();
 
     const determineDifficulty = () => {
-        if (totalMonsterExperience <= experienceBudgetTotal.low) {
+        if (totalMonsterExperience < experienceBudgetTotal.moderate) {
             return 'Low';
-        } else if (totalMonsterExperience <= experienceBudgetTotal.moderate) {
+        } else if (totalMonsterExperience < experienceBudgetTotal.high) {
             return 'Moderate';
         } else {
             return 'High';
         }
     };
-
     const difficulty = determineDifficulty();
 
     const crValues = [
@@ -104,7 +100,7 @@ const EncounterBuilder = () => {
         { value: 0.125, label: '1/8' },
         { value: 0.25, label: '1/4' },
         { value: 0.5, label: '1/2' },
-        ...Array.from({ length: 31 }, (_, i) => ({ value: i, label: i.toString() }))
+        ...Array.from({ length: 30 }, (_, i) => ({ value: i+1, label: (i+1).toString() }))
     ];
 
     return (
@@ -137,26 +133,29 @@ const EncounterBuilder = () => {
                     </div>
                 </div>
                 <div className="selected-monsters-section">
-                    <h2>Selected Monsters</h2>
-                    {selectedMonsters.length > 0 ? (
-                        <ul className="monster-list">
-                            {selectedMonsters.map((monster) => (
-                                <li key={monster.name} className="monster-item">
-                                    <span className="monster-name">{monster.name}</span>
-                                    <button onClick={() => handleMonsterRemove(monster.name)}>Remove</button>
-                                    <button onClick={() => toggleMonsterCollapse(monster.name)}>
-                                        {collapsedMonsters[monster.name] ? 'Show Info' : 'Hide Info'}
-                                    </button>
-                                    {!collapsedMonsters[monster.name] && (
-                                        <MonsterDetails monster={monster} />
-                                    )}
-                                </li>
-                            ))}
-                        </ul>
-                    ) : (
-                        <p>No monsters selected</p>
+    <h2>Selected Monsters
+    {selectedMonsters.length > 0 && (
+                    <button onClick={handleRemoveAllMonsters}>Remove All</button>
+                )} </h2>
+    {selectedMonsters.length > 0 ? (
+        <ul className="monster-list">
+            {selectedMonsters.map((monster, idx) => (
+                <li key={monster.name} className="monster-item">
+                    <span className="monster-name">{monster.name}</span>
+                    <button onClick={() => handleMonsterRemove(idx)}>Remove</button>
+                    <button onClick={() => toggleMonsterCollapse(monster.name)}>
+                        {collapsedMonsters[monster.name] ? 'Show Info' : 'Hide Info'}
+                    </button>
+                    {!collapsedMonsters[monster.name] && (
+                        <MonsterDetails monster={monster} />
                     )}
-                </div>
+                </li>
+            ))}
+        </ul>
+    ) : (
+        <p>No monsters selected</p>
+    )}
+</div>
                 <div className="environment-section">
                     <h2>Select Environment</h2>
                     <select value={selectedEnvironment} onChange={handleEnvironmentChange}>

@@ -24,6 +24,8 @@ export interface Monster {
     languages: string;
     actions: { name: string; desc: string }[];
     special_abilities: { name: string; desc: string }[];
+    damage_immunities: string;
+    condition_immunities: string;
 }
 
 export const createEncounter = async (monsterIds: string[]): Promise<{ encounter: Monster[]; totalChallengeRating: number }> => {
