@@ -1,40 +1,40 @@
 .monster-section {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 .monster-section-button {
-    background: none;
-    border: none;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-    text-decoration: underline;
-    color: #007bff;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  color: #007bff;
 }
 
 .monster-section-button:hover {
-    color: #0056b3;
+  color: #0056b3;
 }
 
 .monster-list {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 5px;
+  list-style-type: none;
+  padding: 0;
+  margin-top: 5px;
 }
 
 .monster-item {
-    margin-bottom: 5px;
+  margin-bottom: 5px;
 }
 
 .monster-select-button {
-    padding: 5px 5px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
+  padding: 5px 5px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
 }
 
 .monster-select-button:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }

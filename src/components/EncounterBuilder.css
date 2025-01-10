@@ -1,197 +1,206 @@
 .encounter-builder {
-    font-family: Arial, sans-serif;
-    
-    margin: 0 auto;
-    padding: 20px;
-    background-color: #f9f9f9;
-    border-radius: 8px;
-    box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
+  font-family: Arial, sans-serif;
+
+  margin: 0 auto;
+  padding: 20px;
+  background-color: #f9f9f9;
+  border-radius: 8px;
+  box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
 }
 
 h1 {
-    text-align: center;
-    color: #333;
+  text-align: center;
+  color: #333;
 }
 
 .top-section {
-    display: flex;
-    justify-content: space-between;
-    align-items: flex-start;
-    margin-bottom: 20px;
+  display: flex;
+  justify-content: space-between;
+  align-items: flex-start;
+  margin-bottom: 20px;
 }
 
 .party-members-section,
 .experience-section,
 .environment-section {
-    flex: 1;
-    margin-right: 20px;
+  flex: 1;
+  margin-right: 20px;
 }
 
 .party-members-section {
-    max-width: 200px;
+  max-width: 200px;
 }
 
 .experience-section {
-    max-width: 300px;
+  max-width: 300px;
 }
 
 .environment-section {
-    max-width: 200px;
-    margin-left: auto;
+  max-width: 200px;
+  margin-left: auto;
 }
 
 .main-section {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .select-monsters-section,
 .selected-monsters-section {
-    flex: 1;
-    margin-right: 20px;
+  flex: 1;
+  margin-right: 20px;
 }
 
 .selected-monsters-section {
-    max-width: 600px;
-    margin: 0 auto;
+  max-width: 600px;
+  margin: 0 auto;
 }
 
 h2 {
-    color: #555;
+  color: #555;
 }
 
 select {
-    width: 100%;
-    padding: 8px;
-    margin-top: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  width: 100%;
+  padding: 8px;
+  margin-top: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
-
-
 .monster-name {
-    font-weight: bold;
-    color: #333;
+  font-weight: bold;
+  color: #333;
 }
 
 button {
-    padding: 6px 12px;
-    margin-left: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
+  padding: 6px 12px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
 }
 
 button:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 .monster-json {
-    margin-top: 10px;
-    background-color: #f1f1f1;
-    padding: 10px;
-    border-radius: 4px;
-    white-space: pre-wrap;
+  margin-top: 10px;
+  background-color: #f1f1f1;
+  padding: 10px;
+  border-radius: 4px;
+  white-space: pre-wrap;
 }
 
 /* PartyMember styles */
 .party-member {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 4px;
-    margin-bottom: 10px;
-    background-color: #fff;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 10px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  margin-bottom: 10px;
+  background-color: #fff;
 }
 
 .party-member-label {
-    font-weight: bold;
-    color: #333;
+  font-weight: bold;
+  color: #333;
 }
 
 .party-member-select {
-    width: auto;
-    padding: 8px;
-    margin-left: 10px;
-    border: 1px solid #ccc;
-    border-radius: 4px;
+  width: auto;
+  padding: 8px;
+  margin-left: 10px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 
 .party-member-button {
-    padding: 6px 12px;
-    margin-left: 10px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
+  padding: 6px 12px;
+  margin-left: 10px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
 }
 
 .party-member-button:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 /* MonsterSection styles */
 .monster-section {
-    margin-bottom: 20px;
+  margin-bottom: 20px;
 }
 
 .monster-section-button {
-    background: none;
-    border: none;
-    padding: 0;
-    font: inherit;
-    cursor: pointer;
-    text-decoration: underline;
-    color: #007bff;
+  background: none;
+  border: none;
+  padding: 0;
+  font: inherit;
+  cursor: pointer;
+  text-decoration: underline;
+  color: #007bff;
 }
 
 .monster-section-button:hover {
-    color: #0056b3;
+  color: #0056b3;
 }
 
 .monster-list {
-    list-style-type: none;
-    padding: 0;
-    margin-top: 10px;
+  list-style-type: none;
+  padding: 0;
+  margin-top: 10px;
 }
 
 .monster-item {
-    margin-bottom: 10px;
+  margin-bottom: 10px;
 }
 
 .monster-select-button {
-    padding: 6px 12px;
-    border: none;
-    border-radius: 4px;
-    background-color: #007bff;
-    color: #fff;
-    cursor: pointer;
+  padding: 6px 12px;
+  border: none;
+  border-radius: 4px;
+  background-color: #007bff;
+  color: #fff;
+  cursor: pointer;
 }
 
 .monster-select-button:hover {
-    background-color: #0056b3;
+  background-color: #0056b3;
 }
 
 /* Experience Budget styles */
 .experience-budget {
-    display: flex;
-    justify-content: space-between;
+  display: flex;
+  justify-content: space-between;
 }
 
 .experience-budget-low {
-    color: green;
+  color: green;
 }
 
 .experience-budget-moderate {
-    color: orange;
+  color: orange;
 }
 
 .experience-budget-high {
-    color: red;
+  color: red;
+}
+.low-difficulty {
+  color: green;
+}
+
+.moderate-difficulty {
+  color: orange;
+}
+
+.high-difficulty {
+  color: red;
 }
