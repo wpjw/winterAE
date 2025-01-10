@@ -1,35 +1,7 @@
 import React, { useState, useCallback } from "react";
 import { fetchMonsters } from "../api/open5e";
 import "./MonsterSection.css";
-
-// Define the Monster interface to type the monster objects
-interface Monster {
-  id: string;
-  name: string;
-  challenge_rating: string;
-  hit_points: number;
-  type: string;
-  armor_class: number;
-  environments: string[];
-  desc: string;
-  size: string;
-  alignment: string;
-  speed: { walk: number };
-  strength: number;
-  dexterity: number;
-  constitution: number;
-  intelligence: number;
-  wisdom: number;
-  charisma: number;
-  damage_vulnerabilities: string;
-  damage_resistances: string;
-  senses: string;
-  languages: string;
-  actions: { name: string; desc: string }[];
-  special_abilities: { name: string; desc: string }[];
-  damage_immunities: string;
-  condition_immunities: string;
-}
+import { Monster } from "../types/monsters";
 
 // Define the props for the MonsterSection component
 interface MonsterSectionProps {

@@ -9,7 +9,7 @@ export const fetchMonsters = async (cr?: string) => {
     // Make a GET request to the Open5e API to fetch monsters
     const response = await axios.get(`${BASE_URL}/monsters/`, {
       params: {
-        document__slug__iexact: "wotc-srd", // Filter to include only SRD monsters
+        document__slug__iexact: "wotc-srd", // Filter to include only official DnD SRD monsters
         ...(cr !== undefined && { cr }), // Include challenge rating filter if provided
       },
     });
