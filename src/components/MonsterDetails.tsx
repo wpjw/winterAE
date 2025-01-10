@@ -1,37 +1,5 @@
 import React from 'react';
-
-export interface Monster {
-    id: string;
-    name: string;
-    challenge_rating: string;
-    hit_points: number;
-    type: string;
-    armor_class: number;
-    environments: string[];
-    desc: string;
-    size: string;
-    alignment: string;
-    speed: { walk: number; fly?: number; swim?: number };
-    strength: number;
-    dexterity: number;
-    constitution: number;
-    intelligence: number;
-    wisdom: number;
-    charisma: number;
-    damage_vulnerabilities: string;
-    damage_resistances: string;
-    damage_immunities: string;
-    condition_immunities: string;
-    senses: string;
-    languages: string;
-    actions?: { name: string; desc: string }[];
-    special_abilities?: { name: string; desc: string }[];
-    legendary_desc?: string;
-    legendary_actions?: { name: string; desc: string }[];
-    reactions?: { name: string; desc: string }[];
-    bonus_actions?: { name: string; desc: string }[];
-}
-
+import { Monster } from '../types/monsters';
 export interface MonsterDetailsProps {
     monster: Monster;
 }
@@ -48,7 +16,7 @@ const MonsterDetails: React.FC<MonsterDetailsProps> = ({ monster }) => {
             {Boolean(monster.speed.walk) && <p><strong>Speed:</strong> {monster.speed.walk} ft.</p>}
             {monster.speed.fly && <p><strong>Fly Speed:</strong> {monster.speed.fly} ft.</p>}
             {monster.speed.swim && <p><strong>Swim Speed:</strong> {monster.speed.swim} ft.</p>}
-            {monster.challenge_rating && <p><strong>Challenge Rating:</strong> {monster.challenge_rating}</p>}
+            {Boolean(monster.challenge_rating) && <p><strong>Challenge Rating:</strong> {monster.challenge_rating}</p>}
             {Boolean(monster.strength) && <p><strong>Strength:</strong> {monster.strength}</p>}
             {Boolean(monster.dexterity) && <p><strong>Dexterity:</strong> {monster.dexterity}</p>}
             {Boolean(monster.constitution) && <p><strong>Constitution:</strong> {monster.constitution}</p>}

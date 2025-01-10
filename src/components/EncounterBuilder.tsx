@@ -1,22 +1,10 @@
 import React, { useState } from 'react';
-import { Monster } from '../services/encounterService';
+import { calculateExperienceBudget, calculateTotalMonsterExperience } from '../utils/helpers';
 import MonsterSection from './MonsterSection';
 import PartyMember from './PartyMember';
 import MonsterDetails from './MonsterDetails';
 import './EncounterBuilder.css';
-
-const experienceBudget = [
-    [50, 75, 100], [100, 150, 200], [150, 225, 400], [250, 375, 500], [500, 750, 1100],
-    [600, 1000, 1400], [750, 1300, 1700], [1000, 1700, 2100], [1300, 2000, 2600], [1600, 2300, 3100],
-    [1900, 2900, 4100], [2200, 3700, 4700], [2600, 4200, 5400], [2900, 4900, 6200], [3300, 5400, 7800],
-    [3800, 6100, 9800], [4500, 7200, 11700], [5000, 8700, 14200], [5500, 10700, 17200], [6400, 13200, 22000]
-];
-
-const crExperiencePoints: { [key: number]: number } = {
-    0: 10, 0.125: 25, 0.25: 50, 0.5: 100, 1: 200, 2: 450, 3: 700, 4: 1100, 5: 1800, 6: 2300, 7: 2900, 8: 3900, 9: 5000,
-    10: 5900, 11: 7200, 12: 8400, 13: 10000, 14: 11500, 15: 13000, 16: 15000, 17: 18000, 18: 20000, 19: 22000, 20: 25000,
-    21: 33000, 22: 41000, 23: 50000, 24: 62000, 25: 75000, 26: 90000, 27: 105000, 28: 120000, 29: 135000, 30: 155000
-};
+import { Monster } from '../types/monsters';
 
 const environments = [
     "Arctic", "Coastal", "Desert", "Forest", "Grassland", "Hill", "Mountain", "Swamp", "Underdark", "Underwater", "Urban"
@@ -24,24 +12,43 @@ const environments = [
 
 const EncounterBuilder = () => {
     const [selectedMonsters, setSelectedMonsters] = useState<Monster[]>([]);
+    const [partyMembers, setPartyMembers] = useState<{ id: number, level: number }[]>([]);
+    const [nextPartyMemberId, setNextPartyMemberId] = useState(1);
+    const [selectedEnvironment, setSelectedEnvironment] = useState<string>('');
+    const [collapsedMonsters, setCollapsedMonsters] = useState<{ [key: number]: boolean }>({});
 
     const handleMonsterSelect = (monster: Monster) => {
         setSelectedMonsters((prev) => [...prev, monster]);
     };
+
     const handleMonsterRemove = (idx: number) => {
-        setSelectedMonsters((prev) => prev.filter((_, index) => index !== idx));
+        setSelectedMonsters((prev) => {
+            const newMonsters = prev.filter((_, index) => index !== idx);
+            return newMonsters;
+        });
+        setCollapsedMonsters((prev) => {
+            const newCollapsed = { ...prev };
+            Object.keys(newCollapsed).forEach((key) => {
+                const keyNum = parseInt(key, 10);
+                if (keyNum > idx) {
+                    newCollapsed[keyNum - 1] = newCollapsed[keyNum];
+                }
+            });
+            delete newCollapsed[Object.keys(newCollapsed).length];
+            return newCollapsed;
+        });
     };
+
     const handleRemoveAllMonsters = () => {
         setSelectedMonsters([]);
+        setCollapsedMonsters({});
     };
-   
-    const [partyMembers, setPartyMembers] = useState<{ id: number, level: number }[]>([]);
+
     const handleAddPartyMember = () => {
         setPartyMembers((prev) => [...prev, { id: nextPartyMemberId, level: 1 }]);
         setNextPartyMemberId((prev) => prev + 1);
     };
 
-    const [nextPartyMemberId, setNextPartyMemberId] = useState(1);
     const handlePartyMemberLevelChange = (id: number, level: number) => {
         setPartyMembers((prev) => prev.map(member => member.id === id ? { ...member, level } : member));
     };
@@ -49,40 +56,20 @@ const EncounterBuilder = () => {
     const handlePartyMemberRemove = (id: number) => {
         setPartyMembers((prev) => prev.filter(member => member.id !== id));
     };
-    const [selectedEnvironment, setSelectedEnvironment] = useState<string>('');
 
     const handleEnvironmentChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
         setSelectedEnvironment(event.target.value);
     };
-    const [collapsedMonsters, setCollapsedMonsters] = useState<{ [key: string]: boolean }>({});
 
-    const toggleMonsterCollapse = (name: string) => {
+    const toggleMonsterCollapse = (idx: number) => {
         setCollapsedMonsters((prev) => ({
             ...prev,
-            [name]: !prev[name]
+            [idx]: !prev[idx]
         }));
     };
 
-    const calculateExperienceBudget = () => {
-        return partyMembers.reduce((acc, member) => {
-            const [low, moderate, high] = experienceBudget[member.level - 1];
-            return {
-                low: acc.low + low,
-                moderate: acc.moderate + moderate,
-                high: acc.high + high
-            };
-        }, { low: 0, moderate: 0, high: 0 });
-    };
-
-    const calculateTotalMonsterExperience = () => {
-        return selectedMonsters.reduce((total, monster) => {
-            const cr = parseFloat(monster.challenge_rating.toString());
-            return total + (crExperiencePoints[cr] || 0);
-        }, 0);
-    };
-
-    const experienceBudgetTotal = calculateExperienceBudget();
-    const totalMonsterExperience = calculateTotalMonsterExperience();
+    const experienceBudgetTotal = calculateExperienceBudget(partyMembers);
+    const totalMonsterExperience = calculateTotalMonsterExperience(selectedMonsters);
 
     const determineDifficulty = () => {
         if (totalMonsterExperience < experienceBudgetTotal.moderate) {
@@ -93,6 +80,7 @@ const EncounterBuilder = () => {
             return 'High';
         }
     };
+
     const difficulty = determineDifficulty();
 
     const crValues = [
@@ -100,7 +88,7 @@ const EncounterBuilder = () => {
         { value: 0.125, label: '1/8' },
         { value: 0.25, label: '1/4' },
         { value: 0.5, label: '1/2' },
-        ...Array.from({ length: 30 }, (_, i) => ({ value: i+1, label: (i+1).toString() }))
+        ...Array.from({ length: 30 }, (_, i) => ({ value: i + 1, label: (i + 1).toString() }))
     ];
 
     return (
@@ -133,29 +121,30 @@ const EncounterBuilder = () => {
                     </div>
                 </div>
                 <div className="selected-monsters-section">
-    <h2>Selected Monsters
-    {selectedMonsters.length > 0 && (
-                    <button onClick={handleRemoveAllMonsters}>Remove All</button>
-                )} </h2>
-    {selectedMonsters.length > 0 ? (
-        <ul className="monster-list">
-            {selectedMonsters.map((monster, idx) => (
-                <li key={monster.name} className="monster-item">
-                    <span className="monster-name">{monster.name}</span>
-                    <button onClick={() => handleMonsterRemove(idx)}>Remove</button>
-                    <button onClick={() => toggleMonsterCollapse(monster.name)}>
-                        {collapsedMonsters[monster.name] ? 'Show Info' : 'Hide Info'}
-                    </button>
-                    {!collapsedMonsters[monster.name] && (
-                        <MonsterDetails monster={monster} />
+                    <h2>Selected Monsters
+                        {selectedMonsters.length > 0 && (
+                            <button onClick={handleRemoveAllMonsters}>Remove All</button>
+                        )}
+                    </h2>
+                    {selectedMonsters.length > 0 ? (
+                        <ul className="monster-list">
+                            {selectedMonsters.map((monster, idx) => (
+                                <li key={monster.id} className="monster-item">
+                                    <span className="monster-name">{monster.name}</span>
+                                    <button onClick={() => handleMonsterRemove(idx)}>Remove</button>
+                                    <button onClick={() => toggleMonsterCollapse(idx)}>
+                                        {collapsedMonsters[idx] ? 'Show Info' : 'Hide Info'}
+                                    </button>
+                                    {!collapsedMonsters[idx] && (
+                                        <MonsterDetails monster={monster} />
+                                    )}
+                                </li>
+                            ))}
+                        </ul>
+                    ) : (
+                        <p>No monsters selected</p>
                     )}
-                </li>
-            ))}
-        </ul>
-    ) : (
-        <p>No monsters selected</p>
-    )}
-</div>
+                </div>
                 <div className="environment-section">
                     <h2>Select Environment</h2>
                     <select value={selectedEnvironment} onChange={handleEnvironmentChange}>
