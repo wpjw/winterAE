@@ -62,7 +62,7 @@ jobs:
 
       - name: Generate test plan with Copilot
         env:
-          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           TITLE="${{ steps.pr.outputs.title }}"
           PR=${{ inputs.pr_number }}
@@ -102,7 +102,7 @@ jobs:
       # ─── Step 3: Generate and run Playwright tests ───────────────────────
       - name: Generate Playwright test
         env:
-          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           mkdir -p /tmp/qa-run/{tests,screenshots}
 
@@ -163,7 +163,7 @@ jobs:
       # ─── Step 4: Generate report and post to PR ──────────────────────────
       - name: Generate QA report
         env:
-          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         run: |
           cd /tmp/qa-run
           TITLE="${{ steps.pr.outputs.title }}"
