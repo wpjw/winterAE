@@ -1,0 +1,270 @@
+name: QA Playwright
+
+on:
+  workflow_dispatch:
+    inputs:
+      pr_number:
+        description: "PR number to QA"
+        required: true
+        type: number
+
+permissions:
+  contents: read
+  pull-requests: write
+
+env:
+  NODE_OPTIONS: "--max-old-space-size=4096"
+
+jobs:
+  qa:
+    runs-on: ubuntu-latest
+    timeout-minutes: 20
+    steps:
+      # ─── Setup ───────────────────────────────────────────────────────────
+      - name: Checkout PR branch
+        uses: actions/checkout@v4
+        with:
+          ref: refs/pull/${{ inputs.pr_number }}/head
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+
+      - name: Install app dependencies
+        run: npm ci
+
+      - name: Install Playwright
+        run: |
+          npm install -D @playwright/test @axe-core/playwright
+          npx playwright install chromium --with-deps
+
+      - name: Install Copilot CLI
+        run: |
+          curl -fsSL https://gh.io/copilot-install | bash
+          echo "$HOME/.local/bin" >> $GITHUB_PATH
+
+      # ─── Step 1: Read PR and generate test plan ──────────────────────────
+      - name: Fetch PR details
+        id: pr
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          PR=${{ inputs.pr_number }}
+
+          gh pr view $PR --json title,body > /tmp/pr.json
+          gh pr diff $PR > /tmp/pr.diff
+
+          TITLE=$(jq -r '.title' /tmp/pr.json)
+          echo "title=$TITLE" >> $GITHUB_OUTPUT
+          echo "PR: #${PR} — ${TITLE}"
+
+      - name: Generate test plan with Copilot
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: |
+          TITLE="${{ steps.pr.outputs.title }}"
+          PR=${{ inputs.pr_number }}
+          DIFF=$(head -c 10000 /tmp/pr.diff)
+          BODY=$(jq -r '.body // ""' /tmp/pr.json | head -c 3000)
+
+          copilot -s -p "You are a QA engineer. Given this PR for a React app (Create React App), output ONLY valid JSON (no markdown fences) with two keys:
+          1. \"summary\": a 2-4 sentence plain-English summary of what the code changes do
+          2. \"tests\": an array of test scenario objects, each with:
+             - \"name\": descriptive test name
+             - \"route\": the URL path to test (e.g., /)
+             - \"steps\": array of strings describing interactions
+             - \"assertions\": array of strings describing what to verify
+
+          PR #${PR}: ${TITLE}
+
+          PR Description:
+          ${BODY}
+
+          Diff (truncated):
+          ${DIFF}
+
+          This is a React app that runs on localhost:3000. Focus on UI verification.
+          Include accessibility and responsive checks. Output valid JSON only." > /tmp/test-plan.json
+
+          echo "Test plan:"
+          cat /tmp/test-plan.json
+
+      # ─── Step 2: Build the app and start dev server ──────────────────────
+      - name: Build and start app
+        run: |
+          npx react-scripts build
+          npx serve -s build -l 3000 &
+          sleep 3
+          curl -s -o /dev/null -w "%{http_code}" http://localhost:3000 | grep -q "200" && echo "✅ App running" || echo "⚠️ App not responding"
+
+      # ─── Step 3: Generate and run Playwright tests ───────────────────────
+      - name: Generate Playwright test
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: |
+          mkdir -p /tmp/qa-run/{tests,screenshots}
+
+          PLAN=$(cat /tmp/test-plan.json)
+
+          copilot -s -p "You are a Playwright test engineer. Given this test plan JSON, generate a complete Playwright test file in TypeScript.
+
+          Test plan:
+          ${PLAN}
+
+          Base URL: http://localhost:3000
+
+          Requirements:
+          - Import from '@playwright/test'
+          - Try to import AxeBuilder from '@axe-core/playwright' for accessibility
+          - Set video: 'on' in test.use()
+          - Each test scenario becomes a test() block
+          - Use resilient selectors (getByRole, getByText, getByTestId)
+          - Capture a screenshot after each step: page.screenshot({ path: 'screenshots/<name>.png', fullPage: true })
+          - Add waitForLoadState('networkidle') after navigation
+          - Include responsive tests at 375px, 768px, and 1280px widths
+          - Use test.slow() for pages that load data
+          - Output ONLY the TypeScript code, no markdown fences or explanation" > /tmp/qa-run/tests/qa.spec.ts
+
+          echo "Generated test:"
+          cat /tmp/qa-run/tests/qa.spec.ts
+
+      - name: Create Playwright config
+        run: |
+          cat > /tmp/qa-run/playwright.config.ts << 'EOF'
+          import { defineConfig } from '@playwright/test';
+
+          export default defineConfig({
+            testDir: './tests',
+            timeout: 30000,
+            retries: 1,
+            reporter: [['json', { outputFile: 'results.json' }], ['html', { open: 'never' }]],
+            use: {
+              baseURL: 'http://localhost:3000',
+              video: 'on',
+              screenshot: 'on',
+              trace: 'on-first-retry',
+              viewport: { width: 1280, height: 900 },
+            },
+          });
+          EOF
+
+      - name: Run Playwright tests
+        id: tests
+        working-directory: /tmp/qa-run
+        continue-on-error: true
+        run: |
+          npx playwright test 2>&1 | tee test-output.txt
+          EXIT_CODE=${PIPESTATUS[0]}
+          echo "exit_code=$EXIT_CODE" >> $GITHUB_OUTPUT
+          echo "Test exit code: $EXIT_CODE"
+
+      # ─── Step 4: Generate report and post to PR ──────────────────────────
+      - name: Generate QA report
+        env:
+          COPILOT_GITHUB_TOKEN: ${{ secrets.COPILOT_GITHUB_TOKEN }}
+        run: |
+          cd /tmp/qa-run
+          TITLE="${{ steps.pr.outputs.title }}"
+          PR=${{ inputs.pr_number }}
+          PLAN=$(cat /tmp/test-plan.json)
+          TEST_OUTPUT=$(tail -50 test-output.txt)
+          RESULTS=""
+          if [ -f results.json ]; then
+            RESULTS=$(cat results.json | head -c 5000)
+          fi
+
+          copilot -s -p "Generate a GitHub-flavored markdown QA report. Use ONLY the data provided — do not invent results.
+
+          PR #${PR}: ${TITLE}
+          Base URL: http://localhost:3000
+
+          Test plan:
+          ${PLAN}
+
+          Playwright output:
+          ${TEST_OUTPUT}
+
+          Results JSON (may be truncated):
+          ${RESULTS}
+
+          Format:
+          ## QA Report — PR #${PR}: ${TITLE}
+
+          ### PR Summary
+          (from test plan)
+
+          ### Testing Instructions
+          (numbered checklist, [x] passed, [ ] failed/skipped)
+
+          ### Test Results
+          | Test | Status |
+          |------|--------|
+          | name | ✅ Pass or ❌ Fail: reason |
+
+          ### Demo
+          Video and screenshots available in workflow artifacts.
+
+          ### Accessibility Audit
+          (from test output, or None)
+
+          ### QA Notes
+          (observations worth flagging)
+
+          ### Errors & Warnings
+          (from output, or None)
+
+          Output ONLY the markdown." > /tmp/qa-report.md
+
+          echo "QA Report:"
+          cat /tmp/qa-report.md
+
+      - name: Post QA report as PR comment
+        uses: actions/github-script@v7
+        with:
+          script: |
+            const fs = require('fs');
+            const report = fs.readFileSync('/tmp/qa-report.md', 'utf8');
+
+            const marker = '<!-- qa-playwright-bot -->';
+            const body = `${marker}\n${report}\n\n---\n_Generated by [QA Playwright](${context.serverUrl}/${context.repo.owner}/${context.repo.repo}/actions/runs/${context.runId})_`;
+
+            const comments = await github.rest.issues.listComments({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              issue_number: ${{ inputs.pr_number }},
+              per_page: 100,
+            });
+
+            const existing = comments.data.find(c => c.body?.includes(marker));
+
+            if (existing) {
+              await github.rest.issues.updateComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                comment_id: existing.id,
+                body,
+              });
+            } else {
+              await github.rest.issues.createComment({
+                owner: context.repo.owner,
+                repo: context.repo.repo,
+                issue_number: ${{ inputs.pr_number }},
+                body,
+              });
+            }
+
+      - name: Upload artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: qa-playwright-results
+          path: |
+            /tmp/qa-run/screenshots/
+            /tmp/qa-run/test-results/
+            /tmp/qa-run/playwright-report/
+            /tmp/qa-run/results.json
+            /tmp/qa-run/test-output.txt
+            /tmp/qa-report.md
+          retention-days: 14
