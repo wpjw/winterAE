@@ -110,6 +110,8 @@ jobs:
 
           copilot -s -p "You are a Playwright test engineer. Given this test plan JSON, generate a complete Playwright test file in TypeScript.
 
+          CRITICAL: Your response must start with an import statement. Do NOT include any preamble, explanation, commentary, or markdown. Output raw TypeScript code only.
+
           Test plan:
           ${PLAN}
 
@@ -125,7 +127,13 @@ jobs:
           - Add waitForLoadState('networkidle') after navigation
           - Include responsive tests at 375px, 768px, and 1280px widths
           - Use test.slow() for pages that load data
-          - Output ONLY the TypeScript code, no markdown fences or explanation" > /tmp/qa-run/tests/qa.spec.ts
+          - Start your output with 'import' — no other text before it" > /tmp/qa-run/tests/qa.spec.ts
+
+          # Strip any preamble before the first import statement
+          if ! head -1 /tmp/qa-run/tests/qa.spec.ts | grep -q "^import"; then
+            sed -n '/^import/,$p' /tmp/qa-run/tests/qa.spec.ts > /tmp/qa-run/tests/qa.spec.ts.clean
+            mv /tmp/qa-run/tests/qa.spec.ts.clean /tmp/qa-run/tests/qa.spec.ts
+          fi
 
           echo "Generated test:"
           cat /tmp/qa-run/tests/qa.spec.ts
