@@ -135,6 +135,9 @@ jobs:
             mv /tmp/qa-run/tests/qa.spec.ts.clean /tmp/qa-run/tests/qa.spec.ts
           fi
 
+          # Remove any markdown fences (```typescript, ```ts, ```) that Copilot may include
+          sed -i '/^```/d' /tmp/qa-run/tests/qa.spec.ts
+
           echo "Generated test:"
           cat /tmp/qa-run/tests/qa.spec.ts
 
